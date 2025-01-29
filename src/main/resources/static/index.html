@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Шифрование Хаффмана</title>
+</head>
+<body>
+<div class="container">
+    <h1>Шифрование Хаффмана</h1>
+    <textarea id="inputText" placeholder="Введите текст для шифрования..."></textarea>
+    <button onclick="encryptText()">Зашифровать</button>
+    <div class="result" id="result"></div>
+
+    <h2>Вероятности появления символов</h2>
+    <button onclick="calculateProbabilities()">Рассчитать вероятности</button>
+    <div class="result" id="probabilities"></div>
+
+    <h2>Кодировка конкретного символа</h2>
+    <input type="text" id="characterInput" placeholder="Введите символ" maxlength="1">
+    <button onclick="getCodeForCharacter()">Получить кодировку</button>
+    <div class="result" id="characterCode"></div>
+</div>
+
+<script>
+    async function encryptText() {
+        const text = document.getElementById('inputText').value;
+        const response = await fetch('/api/huffman/encrypt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(text)
+        });
+
+        if (response.ok) {
+            const encryptedText = await response.text();
+            document.getElementById('result').innerText = 'Зашифрованный текст: ' + encryptedText;
+        } else {
+            document.getElementById('result').innerText = 'Ошибка при шифровании текста.';
+        }
+    }
+
+    async function calculateProbabilities() {
+        const text = document.getElementById('inputText').value;
+        const response = await fetch('/api/huffman/probabilities', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(text)
+        });
+
+        if (response.ok) {
+            const probabilities = await response.json();
+            let probabilitiesText = 'Вероятности появления символов:\n';
+            for (const [char, prob] of Object.entries(probabilities)) {
+                probabilitiesText += `${char}: ${prob.toFixed(4)}\n`;
+            }
+            document.getElementById('probabilities').innerText = probabilitiesText;
+        } else {
+            document.getElementById('probabilities').innerText = 'Ошибка при расчете вероятностей.';
+        }
+    }
+
+    async function getCodeForCharacter() {
+        const text = document.getElementById('inputText').value;
+        const character = document.getElementById('characterInput').value;
+        const response = await fetch('/api/huffman/code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: text, character: character })
+        });
+
+        if (response.ok) {
+            const code = await response.text();
+            document.getElementById('characterCode').innerText = 'Кодировка символа "' + character + '": ' + code;
+        } else {
+            document.getElementById('characterCode').innerText = 'Ошибка при получении кодировки символа.';
+        }
+    }
+</script>
+</body>
+</html>

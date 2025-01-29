@@ -1,0 +1,20 @@
+# Конфигурация сервера
+server:
+  port: 8080
+
+# Конфигурация логирования
+logging:
+  level:
+    root: INFO
+
+# Исключение автоконфигурации R2DBC
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
+
+  # Конфигурация Thymeleaf (если используете)
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
